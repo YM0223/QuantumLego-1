@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from lego_env import Legoenv, Biased_Legoenv
-import gym
+import gymnasium as gym
 
 from sb3_contrib.common.wrappers import ActionMasker
 from sb3_contrib.ppo_mask import MaskablePPO

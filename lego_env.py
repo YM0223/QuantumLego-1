@@ -2,7 +2,7 @@
 
 
 import distance
-from gym import Env, spaces
+from gymnasium import Env, spaces
 from itertools import product, combinations, chain
 from functools import reduce
 from math import floor, sqrt
@@ -269,7 +269,7 @@ class Legoenv(Env):
             self.cmat = old_cmat
         return reward
 
-    def reset(self, state=None):
+    def reset(self, state=None,seed=None,options=None):
         self.available_legs = [] # labels of qubit numbers
         self.contracted_legs = [] # list of tuples
         self.num_legs = 0
