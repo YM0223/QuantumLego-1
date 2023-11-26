@@ -139,6 +139,7 @@ class Legoenv(Env):
         info = {'debug': []}
         self.actions.append(action)  # for debugging purposes
         done = False
+        truncated = False
         reward = 0.01 # small reward for taking valid actions
 
         num_tensor_actions = self.num_tensor_types * self.max_tensors
@@ -244,7 +245,7 @@ class Legoenv(Env):
             if self.debug_mode:
                 print("Final Distance is: ", reward)
 
-        return self.state, reward, done, info
+        return self.state, reward, done, truncated, info
 
     def render(self):
         # print debugging stuff here
@@ -284,7 +285,7 @@ class Legoenv(Env):
             self.state = state
         self.cmat = None
         self.actions = []
-        return self.state
+        return self.state, {}
 
     def state_to_tuple_key(self):
         terminated = (self.state[-1] == 1)

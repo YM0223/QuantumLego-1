@@ -11,9 +11,9 @@ from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("--nmax", type=int)
-parser.add_argument("--ntensor", type=int)
-parser.add_argument("--timesteps", type=int)
+parser.add_argument("--nmax", type=int,default=14)
+parser.add_argument("--ntensor", type=int,default=6)
+parser.add_argument("--timesteps", type=int,default=3)
 parser.add_argument("--desc")
 args = parser.parse_args()
 
