@@ -23,7 +23,7 @@ class Legoenv(Env):
         self.base_distance = 2
         self.tensor_size = len(STABILIZERS)
         self.num_tensor_types = 1
-        self.debug_mode = False
+        self.debug_mode = True
 
         # include the max number of legs willing to accommodate
         self.max_tensors = max_tensors
@@ -139,7 +139,7 @@ class Legoenv(Env):
         info = {'debug': []}
         self.actions.append(action)  # for debugging purposes
         done = False
-        truncated = False
+        terminated = False
         reward = 0.01 # small reward for taking valid actions
 
         num_tensor_actions = self.num_tensor_types * self.max_tensors
@@ -237,7 +237,7 @@ class Legoenv(Env):
 
 
         else:
-            done = True
+            terminated = True
             self.state[-1] = 1
 
             reward = self.calculate_reward()
@@ -245,7 +245,8 @@ class Legoenv(Env):
             if self.debug_mode:
                 print("Final Distance is: ", reward)
 
-        return self.state, reward, done, truncated, info
+        print(info)
+        return self.state, reward, terminated, done, info
 
     def render(self):
         # print debugging stuff here
