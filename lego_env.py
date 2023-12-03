@@ -245,7 +245,7 @@ class Legoenv(Env):
             if self.debug_mode:
                 print("Final Distance is: ", reward)
 
-        print(info)
+        #print(info)
         return self.state, reward, terminated, done, info
 
     def render(self):
