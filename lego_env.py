@@ -23,7 +23,7 @@ class Legoenv(Env):
         self.base_distance = 2
         self.tensor_size = len(STABILIZERS)
         self.num_tensor_types = 1
-        self.debug_mode = True
+        self.debug_mode = False
 
         # include the max number of legs willing to accommodate
         self.max_tensors = max_tensors
