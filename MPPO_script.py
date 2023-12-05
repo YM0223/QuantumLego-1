@@ -13,7 +13,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--nmax", type=int,default=14)
 parser.add_argument("--ntensor", type=int,default=6)
-parser.add_argument("--timesteps", type=int,default=40000)
+parser.add_argument("--timesteps", type=int,default=150000)
 parser.add_argument("--desc")
 args = parser.parse_args()
 
@@ -95,12 +95,16 @@ def mask_fn(env: gym.Env) -> np.ndarray:
             mask[a] = True
     return np.array(mask)
 
+import time
+
+
+
 
 
 def main():
-
+    start = time.time()
     env = ActionMasker(Biased_Legoenv(max_tensors=args.ntensor), mask_fn)
-    model = MaskablePPO("MlpPolicy", env, learning_rate=0.0003, n_steps=100, verbose=1, gamma=1,ent_coef=.01, tensorboard_log="./lego_tensorboard/")
+    model = MaskablePPO("MlpPolicy", env, learning_rate=0.0003, n_steps=2048, verbose=1, gamma=1,ent_coef=.01, tensorboard_log="./lego_tensorboard/")
 
     checkpoint_callback = CheckpointCallback(save_freq=2048, save_path="./logs/nmax{}nt{}_normerr_{}/checkpoints".format(args.nmax, args.ntensor, args.desc))
     model.learn(total_timesteps=args.timesteps,
@@ -109,5 +113,8 @@ def main():
                 callback=checkpoint_callback,
                 progress_bar=True)
 
+    process_time = time.time() - start
+
+    print(process_time)
 if __name__ == '__main__':
     main()
