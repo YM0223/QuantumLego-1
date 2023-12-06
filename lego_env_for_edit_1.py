@@ -856,3 +856,5 @@ class Check_Matrix(object):
 
 
 print(Check_Matrix(STABILIZERS).mat)
+
+print(Biased_Legoenv(max_tensors=14).legs_to_tensor)
