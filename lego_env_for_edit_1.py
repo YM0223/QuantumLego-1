@@ -361,7 +361,7 @@ class T6_Stabilizer(object):
     def combine(self, other, idx1, idx2):
         legs = [l for l in (self.available_legs + other.available_legs) if (l != idx1 and l != idx2)]
         check_matrix = self.check_matrix.single_trace(other.check_matrix, idx1, idx2)
-        stabilizers = check_matrix.generate_stabilizers()
+        stabilizers = check_matrix.generate_stabilizers_from_mat()
         return T6_Stabilizer(legs, check_matrix, stabilizers)
 
 
@@ -854,7 +854,15 @@ class Check_Matrix(object):
         self.n_qubits += other.n_qubits - 2
         return self
 
-
+#行列出力
 print(Check_Matrix(STABILIZERS).mat)
 
-print(Biased_Legoenv(max_tensors=14).legs_to_tensor)
+#LegoEnvからいろいろ出力(うまくいかない)
+#print(Biased_Legoenv(max_tensors=14).legs_to_tensor)
+#print(Biased_Legoenv(max_tensors=14).render())
+
+
+print(T6_Stabilizer([2,4,6]).check_matrix.mat)
+
+
+print(T6_Stabilizer([2,4,6]).combine(T6_Stabilizer([2,4,5]),2,4).check_matrix.mat)

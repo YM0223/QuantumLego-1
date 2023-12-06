@@ -107,8 +107,7 @@ def main():
     model.learn(total_timesteps=args.timesteps,
                 tb_log_name="nmax {} ntensor {} (normalized) {}".format(args.nmax, args.ntensor, args.desc),
                 reset_num_timesteps=False,
-                callback=checkpoint_callback,
-                progress_bar=True)
+                callback=checkpoint_callback)
 
     process_time = time.time() - start
 
