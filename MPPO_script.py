@@ -13,7 +13,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--nmax", type=int,default=14)
 parser.add_argument("--ntensor", type=int,default=6)
-parser.add_argument("--timesteps", type=int,default=15000)
+parser.add_argument("--timesteps", type=int,default=1500000)
 parser.add_argument("--desc")
 args = parser.parse_args()
 
@@ -108,7 +108,6 @@ def main():
                 tb_log_name="nmax {} ntensor {} (normalized) {}".format(args.nmax, args.ntensor, args.desc),
                 reset_num_timesteps=False,
                 callback=checkpoint_callback)
-
     process_time = time.time() - start
 
     print(process_time)
