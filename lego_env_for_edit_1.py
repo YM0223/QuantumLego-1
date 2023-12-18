@@ -10,7 +10,7 @@ from collections import defaultdict
 import copy
 import numpy as np
 import scipy.optimize
-import sympy
+#import sympy
 from tensor_enum import *
 import numba
 import numpy.typing as npt
@@ -93,6 +93,17 @@ class Legoenv(Env):
         self.terminal_state[-1] = 1
         self.actions = []
         self.triu_row, self.triu_col = np.triu_indices(self.max_legs, k=1)
+
+    def generate_upper_triangle_indices(self, n):
+        #ここまでしてもtriu_indicesの方が早かったので使わない。
+        # 行インデックスの生成
+        row_indices = np.repeat(np.arange(n-1), range(n-1, 0, -1))
+        
+        # 列インデックスの生成
+        col_indices = np.concatenate([np.arange(i+1, n) for i in range(n-1)])
+
+        return row_indices, col_indices
+
 
     def get_connected_components(self):
         """Returns a dict from tensor idx to connected component"""
@@ -333,8 +344,8 @@ class Biased_Legoenv(Legoenv):
                 reward = -10
             else:
                 removed_mat = np.delete(np.delete(mat_to_check,[0,ncol//2],axis=1), [0,nrow//2], axis=0)
-                A = doubleEnum(removed_mat)
-                B = macWilliamsDouble(A, ncol//2)
+                A = double_enum(removed_mat)
+                B = macwilliams_double(A, ncol//2)
                 # distance = list(zip(*np.where((B-A) > 0)))[0][1] # first index of the form (0, .)
                 n, m = B.shape
                 a_err = 0
@@ -702,6 +713,28 @@ class Check_Matrix(object):
         mat_reduced = scipy.optimize._remove_redundancy._remove_redundancy_id(mat, np.zeros_like(mat[:, 0]))[0]
         return len(mat_reduced)
 
+    def rref_numpy(self, A):
+        A = A.astype(float)  # Ensure the matrix is in float for division
+        rows, cols = A.shape
+        r = 0
+        for c in range(cols):
+            if r >= rows:
+                break
+            slice_ = A[r:rows, c]
+            if slice_.size == 0 or np.all(slice_ == 0):
+                continue
+            pivot = np.argmax(np.abs(slice_)) + r
+            if A[pivot, c] == 0:
+                continue
+            A[[r, pivot]] = A[[pivot, r]]
+            lv = A[r, c]
+            A[r, :] = A[r, :] / lv
+            for row in range(rows):
+                if row != r:
+                    A[row, :] -= A[row, c] * A[r, :]
+            r += 1
+        return (A % 2).astype(int)
+
 
     def self_trace(self, idx1, idx2):
         # swap X's into the first two columns
@@ -762,8 +795,9 @@ class Check_Matrix(object):
         n_rows = len(new_mat)
         if n_rows > 0:
             self.mat = np.vstack(new_mat)
-            # perform row reduction
-            self.mat = np.array(sympy.Matrix(np.vstack(new_mat)).rref()[0]).astype(int) % 2
+            # perform row reduction (sympyを使わないように書き換え)
+            #self.mat = np.array(sympy.Matrix(np.vstack(new_mat)).rref()[0]).astype(int) % 2
+            self.mat=self.rref_numpy(np.vstack(new_mat))
             # remove the all-zero rows
             self.mat = self.mat[~np.all(self.mat == 0, axis=1)]
             # assert self.mat.shape == (len(new_mat), 2 * self.n_qubits)

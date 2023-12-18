@@ -13,7 +13,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--nmax", type=int,default=14)
 parser.add_argument("--ntensor", type=int,default=6)
-parser.add_argument("--timesteps", type=int,default=500)
+parser.add_argument("--timesteps", type=int,default=200)
 parser.add_argument("--desc")
 args = parser.parse_args()
 
