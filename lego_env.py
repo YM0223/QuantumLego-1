@@ -329,6 +329,7 @@ class Biased_Legoenv(Legoenv):
 
                 # p_err = b_err - a_err # unnormalized
                 p_err = 1 - a_err/b_err #normalized
+                #todo assert p_err>=0を確認
                 if p_err <= 0:
                     print(self.state_to_tuple_key())
                     reward = -10
@@ -361,7 +362,7 @@ class T6_Stabilizer(object):
     def combine(self, other, idx1, idx2):
         legs = [l for l in (self.available_legs + other.available_legs) if (l != idx1 and l != idx2)]
         check_matrix = self.check_matrix.single_trace(other.check_matrix, idx1, idx2)
-        stabilizers = check_matrix.generate_stabilizers()
+        stabilizers = check_matrix.generate_stabilizers_from_mat()
         return T6_Stabilizer(legs, check_matrix, stabilizers)
 
 
