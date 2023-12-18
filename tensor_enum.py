@@ -83,9 +83,10 @@ def macWilliamsDouble(A,r_size):
     K = 2**(n-np.log(A.sum())/np.log(2))
     for i in range(r_size):
         for j in range(r_size):
-            Bz += A[i,j]*(z+w)**(n-i)*(z-w)**i*((x+y)/2)**(n-j)*((x-y)/2)**j
+            #Bz += A[i,j]*(z+w)**(n-i)*(z-w)**i*((x+y)/2)**(n-j)*((x-y)/2)**j
+            Bz += A[i,j]*(1+w)**(n-i)*(1-w)**i*((1+y)/2)**(n-j)*((1-y)/2)**j
     simBz = expand(simplify(Bz))
-    simBz = simBz.subs([(x,1),(z,1)])
+    #simBz = simBz.subs([(x,1),(z,1)])
     Bp = np.zeros((r_size, r_size))
     for i in range(r_size):
         for j in range(r_size):

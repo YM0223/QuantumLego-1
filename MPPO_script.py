@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from lego_env import Legoenv, Biased_Legoenv
+from lego_env_for_edit_1 import Legoenv, Biased_Legoenv
 import gymnasium as gym
 
 from sb3_contrib.common.wrappers import ActionMasker
@@ -13,7 +13,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--nmax", type=int,default=14)
 parser.add_argument("--ntensor", type=int,default=6)
-parser.add_argument("--timesteps", type=int,default=15000)
+parser.add_argument("--timesteps", type=int,default=500)
 parser.add_argument("--desc")
 args = parser.parse_args()
 
@@ -101,14 +101,13 @@ import time
 def main():
     start = time.time()
     env = ActionMasker(Biased_Legoenv(max_tensors=args.ntensor), mask_fn)
-    model = MaskablePPO("MlpPolicy", env, learning_rate=0.0003, n_steps=200, verbose=1, gamma=1,ent_coef=.01, tensorboard_log="./lego_tensorboard/")
+    model = MaskablePPO("MlpPolicy", env, learning_rate=0.0003, n_steps=100, verbose=1, gamma=1,ent_coef=.01, tensorboard_log="./lego_tensorboard/")
 
     checkpoint_callback = CheckpointCallback(save_freq=2048, save_path="./logs/nmax{}nt{}_normerr_{}/checkpoints".format(args.nmax, args.ntensor, args.desc))
     model.learn(total_timesteps=args.timesteps,
                 tb_log_name="nmax {} ntensor {} (normalized) {}".format(args.nmax, args.ntensor, args.desc),
                 reset_num_timesteps=False,
                 callback=checkpoint_callback)
-
     process_time = time.time() - start
 
     print(process_time)

@@ -5,7 +5,7 @@ FROM python:3.10.11
 WORKDIR /usr/src/app
 
 # 必要なPythonパッケージのインストール
-RUN pip install --no-cache-dir numpy matplotlib scipy sympy pandas gymnasium sb3_contrib stable-baselines3[extra] tensorboard
+RUN pip install --no-cache-dir numpy matplotlib scipy sympy pandas gymnasium sb3_contrib stable-baselines3[extra] tensorboard snakevis tensorflow
 
 # ポート番号の設定（必要に応じて）
 # EXPOSE 8888

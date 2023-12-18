@@ -62,6 +62,8 @@ class Legoenv(Env):
         self.terminal_state[-1] = 1
         self.actions = []
 
+        self.row_idx_list = np.triu_indices(n = self.max_legs, k=1)[0]
+        self.col_idx_list = np.triu_indices(n = self.max_legs, k=1)[1]
 
     def get_connected_components(self):
         """Returns a dict from tensor idx to connected component"""
@@ -97,40 +99,53 @@ class Legoenv(Env):
         return idxs_to_exclude
 
 
+    def calculate_indices_vectorized(self, row_idx, col_idx, n):
+        # Vectorized calculation for each section
+        cols_1 = np.arange(row_idx, n)
+        rows_2 = np.arange(col_idx)
+        rows_3 = np.arange(row_idx)
+        cols_4 = np.arange(col_idx, n)
+
+        indices_1 = (n * (n - 1)) // 2 - (n - row_idx) * ((n - row_idx) - 1) // 2 + cols_1 - row_idx - 1
+        indices_2 = (n * (n - 1)) // 2 - (n - rows_2) * ((n - rows_2) - 1) // 2 + col_idx - rows_2 - 1
+        indices_3 = (n * (n - 1)) // 2 - (n - rows_3) * ((n - rows_3) - 1) // 2 + row_idx - rows_3 - 1
+        indices_4 = (n * (n - 1)) // 2 - (n - col_idx) * ((n - col_idx) - 1) // 2 + cols_4 - col_idx - 1
+
+        # Combine all indices into one array
+        combined_indices = np.concatenate([indices_1, indices_2, indices_3, indices_4])
+
+        return combined_indices
+
+    def calculate_col_index(self, n, m, k):
+        # k-1群までに含まれる項数を計算(引数のgはk群に対しg=k-1なことに注意)
+        total_items_until_k = k * (2 * n - k - 1) / 2
+
+        # mからこの数字を引いて、k群内でのmの相対的位置を求める
+        x = m + 1 - total_items_until_k
+
+        # 列のインデックスを計算
+        col_idx = (n-1) - x
+        return int(col_idx)
+
     def get_leg_indices_from_contraction_index(self, linear_idx, include_collisions=True):
         """Given idx which represents an (i,j) tuple (of which there are (n choose 2)),
         return (i,j).
         If include_collisions is True also include the indices for pairs (i, .) and (., j)"""
         # first get col, row indices
         n = self.max_legs
-
-        row_idx = np.triu_indices(n, k=1)[0][linear_idx]  # leg 1
-        col_idx = np.triu_indices(n, k=1)[1][linear_idx]  # leg 2
+        # k=(2*n-1-np.sqrt(4*n*n-4*n+1+8*linear_idx))/2
+        # g=int(np.floor(k))
+        # row_idx = g # leg 1
+        # col_idx=self.calculate_col_index(n, linear_idx, g) # leg 2
+        # row_idx = np.triu_indices(n, k=1)[0][linear_idx]  # leg 1
+        # col_idx = np.triu_indices(n, k=1)[1][linear_idx]  # leg 2
+        row_idx=self.row_idx_list[linear_idx]
+        col_idx=self.col_idx_list[linear_idx]
 
         if not include_collisions:
             return row_idx, col_idx
 
-        shared_row_or_col_idxs = []
-
-        # make sure nothing else connects to leg 2
-        for col in range(row_idx, n):
-            idx = (n * (n-1))//2 - (n - row_idx) * ((n - row_idx) - 1)//2 + col - row_idx - 1
-            shared_row_or_col_idxs.append(idx)
-
-        # make sure leg 1 doesn't connect with anything else
-        for row in range(col_idx):
-            idx = (n * (n-1))//2 - (n - row) * ((n - row) - 1)//2 + col_idx - row - 1
-            shared_row_or_col_idxs.append(idx)
-
-        # make sure nothing else connects to leg 1
-        for row in range(row_idx):
-            idx = (n * (n-1))//2 - (n - row) * ((n - row) - 1)//2 + row_idx - row - 1
-            shared_row_or_col_idxs.append(idx)
-
-        # make sure leg 2 doesn't connect with anything else
-        for col in range(col_idx, n):
-            idx = (n * (n-1))//2 - (n - col_idx) * ((n - col_idx) - 1)//2 + col- col_idx - 1
-            shared_row_or_col_idxs.append(idx)
+        shared_row_or_col_idxs =self.calculate_indices_vectorized(row_idx, col_idx, n)
 
         return (row_idx, col_idx), shared_row_or_col_idxs
 
@@ -853,16 +868,3 @@ class Check_Matrix(object):
         self.n_rows = len(self.mat)
         self.n_qubits += other.n_qubits - 2
         return self
-
-#行列出力
-print(Check_Matrix(STABILIZERS).mat)
-
-#LegoEnvからいろいろ出力(うまくいかない)
-#print(Biased_Legoenv(max_tensors=14).legs_to_tensor)
-#print(Biased_Legoenv(max_tensors=14).render())
-
-
-print(T6_Stabilizer([2,4,6]).check_matrix.mat)
-
-
-print(T6_Stabilizer([2,4,6]).combine(T6_Stabilizer([2,4,5]),2,4).check_matrix.mat)
