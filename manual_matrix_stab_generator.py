@@ -4,7 +4,7 @@ from lego_env import *
 
 
 #行列出力
-print(Check_Matrix(STABILIZERS).mat)
+#print(Check_Matrix(STABILIZERS).mat)
 
 #LegoEnvからいろいろ出力(うまくいかない)
 #print(Biased_Legoenv(max_tensors=14).legs_to_tensor)
@@ -43,13 +43,15 @@ class manual_matrix_stab_generator:
 
         combined_stabilizer = current_stabilizer.combine(self.t6stabilizers[stab2], leg1, leg2)
         return self.combine_stabilizers(pair_idx + 1, combined_stabilizer)
-
+print(T6_Stabilizer(0).check_matrix.zero_trace(T6_Stabilizer(0).check_matrix).mat)
 # 使用例
-num_t6stab = 1
-combined_leg_pair = [(1,4)]
+# num_t6stab = 1
+# combined_leg_pair = [(1,4)]
+#num_t6stab = 3
+#combined_leg_pair = [(2, 8), (3, 10), (5, 14)]
 generator = manual_matrix_stab_generator(num_t6stab, combined_leg_pair)
 final_stabilizer = generator.final_stabilizer
-
+print(final_stabilizer)
 # final_stabilizerからcheck_matrixやstabilizersを利用する
 check_matrix = final_stabilizer.check_matrix.mat
 stabilizers = final_stabilizer.stabilizers
