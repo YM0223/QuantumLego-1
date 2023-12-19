@@ -43,10 +43,10 @@ class manual_matrix_stab_generator:
 
         combined_stabilizer = current_stabilizer.combine(self.t6stabilizers[stab2], leg1, leg2)
         return self.combine_stabilizers(pair_idx + 1, combined_stabilizer)
-
+print(T6_Stabilizer(0).check_matrix.zero_trace(T6_Stabilizer(0).check_matrix).mat)
 # 使用例
-num_t6stab = 1
-combined_leg_pair = [(1,4)]
+# num_t6stab = 1
+# combined_leg_pair = [(1,4)]
 #num_t6stab = 3
 #combined_leg_pair = [(2, 8), (3, 10), (5, 14)]
 generator = manual_matrix_stab_generator(num_t6stab, combined_leg_pair)

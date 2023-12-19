@@ -13,13 +13,14 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--nmax", type=int,default=14)
 parser.add_argument("--ntensor", type=int,default=6)
-parser.add_argument("--timesteps", type=int,default=200)
+parser.add_argument("--timesteps", type=int,default=1000)
 parser.add_argument("--desc")
 args = parser.parse_args()
 
-def is_valid(state, action, num_max_actions=17, max_tensors=6, num_min_actions=0):
+
+def is_valid(state, action, env, num_max_actions=17, max_tensors=6, num_min_actions=0):
     state = np.array(state)
-    env = Legoenv(max_tensors=max_tensors)
+    #env = Legoenv(max_tensors=max_tensors)
     out_state = np.zeros_like(state)
     terminal_state = np.zeros_like(state)
     terminal_state[-1] = 1
@@ -53,10 +54,13 @@ def is_valid(state, action, num_max_actions=17, max_tensors=6, num_min_actions=0
         # leg contractions
         # check that there are no collisions
         (leg1, leg2), possible_conflicted_contractions = env.get_leg_indices_from_contraction_index(action - num_tensor_actions)
+        #print(len(possible_conflicted_contractions))
+        #todo for文がないように書き換え
         for contraction_idx in possible_conflicted_contractions:
             if state[contraction_idx + env.max_tensors] != 0:
                 action_valid = False
                 out_state = terminal_state
+                return action_valid, out_state
         # check that the legs in question are spawned by tensors
         if leg1 >= num_active_legs or leg2 >= num_active_legs:
             action_valid = False
@@ -91,7 +95,7 @@ def mask_fn(env: gym.Env) -> np.ndarray:
     s = env.state
     mask = np.zeros(env.action_space.n)
     for a in range(env.action_space.n):
-        if is_valid(s, a, num_max_actions=args.nmax, max_tensors=args.ntensor)[0]:
+        if is_valid(s, a, env=env, num_max_actions=args.nmax, max_tensors=args.ntensor)[0]:
             mask[a] = True
     return np.array(mask)
 

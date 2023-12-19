@@ -48,7 +48,6 @@ def _get_leg_indices_from_contraction_index_impl(
 
 class Legoenv(Env):
     def __init__(self, max_tensors=7):
-
         self.bad_action_reward = -10
         self.bad_code_reward = -.5
         self.base_distance = 2
