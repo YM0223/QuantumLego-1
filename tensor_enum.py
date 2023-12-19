@@ -60,11 +60,13 @@ def double_enum(h: npt.NDArray) -> npt.NDArray[np.int64]:
     n = cols // 2
     enum = np.zeros((n + 1, n + 1), dtype=np.int64)
     for v in genbstring(rows):
-        enum[*xz_wt((v.T @ h) % 2)] += 1
+        w, z = xz_wt((v.T @ h) % 2)  # xz_wt の戻り値を変数に分解
+        enum[w, z] += 1  # アンパック演算子を使用せずにインデックスを指定
     return enum
 
 
-@functools.cache
+#@functools.cache
+@functools.lru_cache(maxsize=None)
 def _macwilliams_impl(r_size: int) -> npt.NDArray[np.float64]:
     # tab[i, j] = x**i coefficient of (1 - x)**j * (1 + 3 * x) ** (r_size - 1 - j)
     tab = np.zeros((r_size, r_size), dtype=np.float64)
@@ -76,8 +78,8 @@ def _macwilliams_impl(r_size: int) -> npt.NDArray[np.float64]:
         tab[:, i_co] = f.coef
     return tab
 
-
-@functools.cache
+#@functools.cache
+@functools.lru_cache(maxsize=None)
 def _macwillamsdouble_impl(r_size: int) -> npt.NDArray:
     # tab[i, j, k, l] = x**i * y**j coefficient of
     # (1 - x)**k * (1 + x) ** (r_size - 1 - k) *

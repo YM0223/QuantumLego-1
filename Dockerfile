@@ -1,5 +1,5 @@
 # 基本イメージとしてPython 3.11を使用
-FROM python:3.11
+FROM python:3.9.2
 
 # 作業ディレクトリの設定
 WORKDIR /usr/src/app
