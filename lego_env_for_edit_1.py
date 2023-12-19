@@ -93,16 +93,6 @@ class Legoenv(Env):
         self.actions = []
         self.triu_row, self.triu_col = np.triu_indices(self.max_legs, k=1)
 
-    def generate_upper_triangle_indices(self, n):
-        #ここまでしてもtriu_indicesの方が早かったので使わない。
-        # 行インデックスの生成
-        row_indices = np.repeat(np.arange(n-1), range(n-1, 0, -1))
-        
-        # 列インデックスの生成
-        col_indices = np.concatenate([np.arange(i+1, n) for i in range(n-1)])
-
-        return row_indices, col_indices
-
 
     def get_connected_components(self):
         """Returns a dict from tensor idx to connected component"""

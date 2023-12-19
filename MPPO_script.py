@@ -13,7 +13,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--nmax", type=int,default=14)
 parser.add_argument("--ntensor", type=int,default=6)
-parser.add_argument("--timesteps", type=int,default=1000)
+parser.add_argument("--timesteps", type=int,default=1500000)
 parser.add_argument("--desc")
 args = parser.parse_args()
 
@@ -56,11 +56,16 @@ def is_valid(state, action, env, num_max_actions=17, max_tensors=6, num_min_acti
         (leg1, leg2), possible_conflicted_contractions = env.get_leg_indices_from_contraction_index(action - num_tensor_actions)
         #print(len(possible_conflicted_contractions))
         #todo for文がないように書き換え
-        for contraction_idx in possible_conflicted_contractions:
-            if state[contraction_idx + env.max_tensors] != 0:
-                action_valid = False
-                out_state = terminal_state
-                return action_valid, out_state
+        # for contraction_idx in possible_conflicted_contractions:
+        #     if state[contraction_idx + env.max_tensors] != 0:
+        #         action_valid = False
+        #         out_state = terminal_state
+        #         return action_valid, out_state
+        conflict_indices = possible_conflicted_contractions + env.max_tensors
+        if np.any(state[conflict_indices] != 0):
+            action_valid = False
+            out_state = terminal_state
+            return action_valid, out_state     
         # check that the legs in question are spawned by tensors
         if leg1 >= num_active_legs or leg2 >= num_active_legs:
             action_valid = False
@@ -105,7 +110,7 @@ import time
 def main():
     start = time.time()
     env = ActionMasker(Biased_Legoenv(max_tensors=args.ntensor), mask_fn)
-    model = MaskablePPO("MlpPolicy", env, learning_rate=0.0003, n_steps=100, verbose=1, gamma=1,ent_coef=.01, tensorboard_log="./lego_tensorboard/")
+    model = MaskablePPO("MlpPolicy", env, learning_rate=0.0003, n_steps=2048, verbose=1, gamma=1,ent_coef=.01, tensorboard_log="./lego_tensorboard/")
 
     checkpoint_callback = CheckpointCallback(save_freq=2048, save_path="./logs/nmax{}nt{}_normerr_{}/checkpoints".format(args.nmax, args.ntensor, args.desc))
     model.learn(total_timesteps=args.timesteps,
