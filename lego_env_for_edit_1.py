@@ -47,7 +47,7 @@ def _get_leg_indices_from_contraction_index_impl(
 
 
 class Legoenv(Env):
-    def __init__(self, max_tensors=7):
+    def __init__(self, max_tensors=6):
         self.bad_action_reward = -10
         self.bad_code_reward = -.5
         self.base_distance = 2
@@ -87,22 +87,12 @@ class Legoenv(Env):
         self.available_legs = [] # labels of qubit numbers
         self.contracted_legs = [] # list of tuples
 
-        self.state = np.zeros(self.observation_space.shape)
+        #self.state = np.zeros(self.observation_space.shape)
+        self.state = np.zeros(self.max_tensors+self.num_leg_combinations+1)
         self.terminal_state = self.state.copy()
         self.terminal_state[-1] = 1
         self.actions = []
         self.triu_row, self.triu_col = np.triu_indices(self.max_legs, k=1)
-
-    def generate_upper_triangle_indices(self, n):
-        #ここまでしてもtriu_indicesの方が早かったので使わない。
-        # 行インデックスの生成
-        row_indices = np.repeat(np.arange(n-1), range(n-1, 0, -1))
-        
-        # 列インデックスの生成
-        col_indices = np.concatenate([np.arange(i+1, n) for i in range(n-1)])
-
-        return row_indices, col_indices
-
 
     def get_connected_components(self):
         """Returns a dict from tensor idx to connected component"""
@@ -182,6 +172,7 @@ class Legoenv(Env):
                 info['debug'].append("Invalid tensor choice")
             else:
                 self.state[tensor_idx] = 1 + tensor_type
+                #self.num_contractions += 1 + tensor_type
                 tensor_legs = (self.num_legs, self.num_legs + self.tensor_size)
                 self.num_legs = self.num_legs + self.tensor_size
                 # insert tensor type as unconnected
@@ -309,9 +300,11 @@ class Legoenv(Env):
         self.tensor_to_components = {i: i for i in range(self.max_tensors)}
 
         if state is None:
-            self.state = np.zeros(self.observation_space.shape)
+            #self.state = np.zeros(self.observation_space.shape)
+            self.state = np.zeros(self.max_tensors+self.num_leg_combinations+1)
         else:
             self.state = state
+            self.num_contractions = 0
         self.cmat = None
         self.actions = []
         return self.state, {}
@@ -358,11 +351,13 @@ class Biased_Legoenv(Legoenv):
                 # p_err = b_err - a_err # unnormalized
                 p_err = 1 - a_err/b_err #normalized
                 if p_err <= 0:
-                    print(self.state_to_tuple_key())
+                    #print(self.state_to_tuple_key())
                     reward = -10
                 else:
                     reward = np.log(p_thresh)-np.log(p_err)
                 # (p_thresh - p_err)/p_thresh * 50 # 2% improvement gives a score of 1
+                    if reward>=0:
+                        print(self.state_to_tuple_key())
         else:
              reward = -8
 
