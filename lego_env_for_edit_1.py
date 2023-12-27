@@ -218,6 +218,7 @@ class Legoenv(Env):
                 else:
                     # TODO: fix up available_legs, actually might not be necessary
                     self.state[action] = 1  # state update is binary for whether those are connected
+                    #print(f"Action number: {action}, Action has been changed.")
                     # check whether either one or both are connected
                     # TODO: remove these since this is trivially true
                     leg1_connected, leg2_connected = self.tensor_info[tensor_1][0], self.tensor_info[tensor_2][0]
