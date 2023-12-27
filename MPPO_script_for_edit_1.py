@@ -13,7 +13,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--nmax", type=int,default=14)
 parser.add_argument("--ntensor", type=int,default=6)
-parser.add_argument("--timesteps", type=int,default=2000000)
+parser.add_argument("--timesteps", type=int,default=200)
 parser.add_argument("--desc")
 args = parser.parse_args()
 
@@ -67,6 +67,7 @@ def is_valid(state, action, env, num_max_actions, max_tensors, num_min_actions=0
 def mask_fn(env: gym.Env) -> np.ndarray:
     s = env.state
     mask = np.zeros(env.action_space.n)
+    #print(env.action_space)
     for a in range(env.action_space.n):
         if is_valid(s, a, env=env, num_max_actions=args.nmax, max_tensors=args.ntensor):
             mask[a] = True
